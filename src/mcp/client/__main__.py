@@ -10,7 +10,7 @@ from anyio.streams.memory import MemoryObjectReceiveStream, MemoryObjectSendStre
 import mcp.types as types
 from mcp.client.session import ClientSession
 from mcp.client.sse import sse_client
-from mcp.client.stdio import StdioServerParameters, stdio_client
+
 from mcp.shared.message import SessionMessage
 from mcp.shared.session import RequestResponder
 
@@ -52,15 +52,9 @@ async def run_session(
 async def main(command_or_url: str, args: list[str], env: list[tuple[str, str]]):
     env_dict = dict(env)
 
-    if urlparse(command_or_url).scheme in ("http", "https"):
-        # Use SSE client for HTTP(S) URLs
-        async with sse_client(command_or_url) as streams:
-            await run_session(*streams)
-    else:
-        # Use stdio client for commands
-        server_parameters = StdioServerParameters(command=command_or_url, args=args, env=env_dict)
-        async with stdio_client(server_parameters) as streams:
-            await run_session(*streams)
+    # Use SSE client for HTTP(S) URLs
+    async with sse_client(command_or_url) as streams:
+        await run_session(*streams)
 
 
 def cli():

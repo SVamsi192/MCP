@@ -21,8 +21,8 @@ async def fetch_website(
 @click.option("--port", default=8000, help="Port to listen on for SSE")
 @click.option(
     "--transport",
-    type=click.Choice(["stdio", "sse"]),
-    default="stdio",
+    type=click.Choice(["sse"]),
+    default="sse",
     help="Transport type",
 )
 def main(port: int, transport: str) -> int:
@@ -56,43 +56,32 @@ def main(port: int, transport: str) -> int:
             )
         ]
 
-    if transport == "sse":
-        from mcp.server.sse import SseServerTransport
-        from starlette.applications import Starlette
-        from starlette.responses import Response
-        from starlette.routing import Mount, Route
+    from mcp.server.sse import SseServerTransport
+    from starlette.applications import Starlette
+    from starlette.responses import Response
+    from starlette.routing import Mount, Route
 
-        sse = SseServerTransport("/messages/")
+    sse = SseServerTransport("/messages/")
 
-        async def handle_sse(request):
-            async with sse.connect_sse(
-                request.scope, request.receive, request._send
-            ) as streams:
-                await app.run(
-                    streams[0], streams[1], app.create_initialization_options()
-                )
-            return Response()
+    async def handle_sse(request):
+        async with sse.connect_sse(
+            request.scope, request.receive, request._send
+        ) as streams:
+            await app.run(
+                streams[0], streams[1], app.create_initialization_options()
+            )
+        return Response()
 
-        starlette_app = Starlette(
-            debug=True,
-            routes=[
-                Route("/sse", endpoint=handle_sse, methods=["GET"]),
-                Mount("/messages/", app=sse.handle_post_message),
-            ],
-        )
+    starlette_app = Starlette(
+        debug=True,
+        routes=[
+            Route("/sse", endpoint=handle_sse, methods=["GET"]),
+            Mount("/messages/", app=sse.handle_post_message),
+        ],
+    )
 
-        import uvicorn
+    import uvicorn
 
-        uvicorn.run(starlette_app, host="127.0.0.1", port=port)
-    else:
-        from mcp.server.stdio import stdio_server
-
-        async def arun():
-            async with stdio_server() as streams:
-                await app.run(
-                    streams[0], streams[1], app.create_initialization_options()
-                )
-
-        anyio.run(arun)
+    uvicorn.run(starlette_app, host="127.0.0.1", port=port)
 
     return 0

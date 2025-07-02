@@ -22,7 +22,7 @@ from typing_extensions import Self
 import mcp
 from mcp import types
 from mcp.client.sse import sse_client
-from mcp.client.stdio import StdioServerParameters
+
 from mcp.client.streamable_http import streamablehttp_client
 from mcp.shared.exceptions import McpError
 
@@ -62,7 +62,7 @@ class StreamableHttpParameters(BaseModel):
     terminate_on_close: bool = True
 
 
-ServerParameters: TypeAlias = StdioServerParameters | SseServerParameters | StreamableHttpParameters
+ServerParameters: TypeAlias = SseServerParameters | StreamableHttpParameters
 
 
 class ClientSessionGroup:
@@ -238,10 +238,7 @@ class ClientSessionGroup:
         session_stack = contextlib.AsyncExitStack()
         try:
             # Create read and write streams that facilitate io with the server.
-            if isinstance(server_params, StdioServerParameters):
-                client = mcp.stdio_client(server_params)
-                read, write = await session_stack.enter_async_context(client)
-            elif isinstance(server_params, SseServerParameters):
+            if isinstance(server_params, SseServerParameters):
                 client = sse_client(
                     url=server_params.url,
                     headers=server_params.headers,

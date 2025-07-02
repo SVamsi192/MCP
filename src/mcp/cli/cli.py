@@ -18,7 +18,6 @@ except ImportError:
     sys.exit(1)
 
 try:
-    from mcp.cli import claude
     from mcp.server.fastmcp.utilities.logging import get_logger
 except ImportError:
     print("Error: mcp.server.fastmcp is not installed or not in PYTHONPATH")
@@ -313,7 +312,7 @@ def run(
         typer.Option(
             "--transport",
             "-t",
-            help="Transport protocol to use (stdio or sse)",
+            help="Transport protocol to use (sse or streamable-http)",
         ),
     ] = None,
 ) -> None:
@@ -431,9 +430,8 @@ def install(
         },
     )
 
-    if not claude.get_claude_config_path():
-        logger.error("Claude app not found")
-        sys.exit(1)
+    logger.error("Claude integration has been removed")
+    sys.exit(1)
 
     # Try to import server to get its name, but fall back to file name if dependencies
     # missing
@@ -476,14 +474,5 @@ def install(
             key, value = _parse_env_var(env_var)
             env_dict[key] = value
 
-    if claude.update_claude_config(
-        file_spec,
-        name,
-        with_editable=with_editable,
-        with_packages=with_packages,
-        env_vars=env_dict,
-    ):
-        logger.info(f"Successfully installed {name} in Claude app")
-    else:
-        logger.error(f"Failed to install {name} in Claude app")
-        sys.exit(1)
+    logger.error("Claude integration has been removed")
+    sys.exit(1)

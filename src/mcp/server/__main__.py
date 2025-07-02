@@ -6,7 +6,7 @@ import anyio
 
 from mcp.server.models import InitializationOptions
 from mcp.server.session import ServerSession
-from mcp.server.stdio import stdio_server
+
 from mcp.types import ServerCapabilities
 
 if not sys.warnoptions:
@@ -30,7 +30,7 @@ async def receive_loop(session: ServerSession):
 
 async def main():
     version = importlib.metadata.version("mcp")
-    async with stdio_server() as (read_stream, write_stream):
+
         async with (
             ServerSession(
                 read_stream,

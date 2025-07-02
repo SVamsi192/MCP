@@ -8,8 +8,7 @@ from typing import Any
 
 import httpx
 from dotenv import load_dotenv
-from mcp import ClientSession, StdioServerParameters
-from mcp.client.stdio import stdio_client
+
 
 # Configure logging
 logging.basicConfig(
@@ -83,18 +82,12 @@ class Server:
         if command is None:
             raise ValueError("The command must be a valid string and cannot be None.")
 
-        server_params = StdioServerParameters(
-            command=command,
-            args=self.config["args"],
-            env={**os.environ, **self.config["env"]}
-            if self.config.get("env")
-            else None,
-        )
+        # Note: This example now requires SSE-based servers
+        # stdio transport has been removed
+        raise NotImplementedError("This example now requires SSE-based MCP servers")
         try:
-            stdio_transport = await self.exit_stack.enter_async_context(
-                stdio_client(server_params)
-            )
-            read, write = stdio_transport
+            # Placeholder for SSE client connection
+            read, write = None, None
             session = await self.exit_stack.enter_async_context(
                 ClientSession(read, write)
             )

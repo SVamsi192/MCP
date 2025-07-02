@@ -1,8 +1,6 @@
 from .client.session import ClientSession
 from .client.session_group import ClientSessionGroup
-from .client.stdio import StdioServerParameters, stdio_client
 from .server.session import ServerSession
-from .server.stdio import stdio_server
 from .shared.exceptions import McpError
 from .types import (
     CallToolRequest,
@@ -103,14 +101,11 @@ __all__ = [
     "ServerResult",
     "ServerSession",
     "SetLevelRequest",
-    "StdioServerParameters",
     "StopReason",
     "SubscribeRequest",
     "Tool",
     "ToolsCapability",
     "UnsubscribeRequest",
-    "stdio_client",
-    "stdio_server",
     "CompleteRequest",
     "JSONRPCResponse",
 ]
